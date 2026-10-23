@@ -49,4 +49,11 @@ Luz natural quente, ambiente de varanda/área externa: mesa de madeira avermelha
 
 ## História e produtos do cliente
 
-_A preencher com as informações enviadas pelo cliente._
+Resumo do que aparece no Instagram (detalhes e diagnóstico em `instagram-analise.md`):
+
+- Indústria baiana de temperos, condimentos, especiarias e alimentos, há mais de 20 anos ("Grupo DaAna Produtos").
+- A marca é inspirada em **Ana Delmira** (a casa de taipa, o fogão a lenha e os doces caseiros: manauê, cocada, bolo de aipim, arroz-doce).
+- Vende para lojistas (B2B) e para quem cozinha em casa (B2C).
+- Produtos já vistos: tempero Ana Maria, páprica doce, orégano, sal, pimenta, grão-de-bico 250 g, farinha de aveia, castanha, óleo de coco, molho inglês, granola crocante 200 g.
+
+_Completar com as informações enviadas pelo cliente._
