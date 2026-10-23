@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: 'Playfair'; font-style: normal; font-weight: 700; src: url(node_modules/@fontsource/playfair-display/files/playfair-display-latin-700-normal.woff2); }
+@font-face { font-family: 'Playfair'; font-style: italic; font-weight: 700; src: url(node_modules/@fontsource/playfair-display/files/playfair-display-latin-700-italic.woff2); }
+@font-face { font-family: 'Montserrat'; font-weight: 800; src: url(node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2); }
+html, body { margin: 0; padding: 0; background: #000; }
+#stage { position: relative; width: 1536px; height: 128px; overflow: hidden; background: #8c4a28; }
+#stage > * { position: absolute; }
+canvas#barro { left: 0; top: 0; }
+#red { left: 0; top: 0; width: 1536px; height: 128px; background: radial-gradient(ellipse at 50% 50%, #ec0a24 0%, #d10019 70%, #b80016 100%); }
+#stripes { left: 0; top: 0; }
+#line { left: 0; top: 0; }
+.txt { top: 0; height: 128px; display: flex; align-items: center; white-space: nowrap;
+  font-family: 'Playfair', serif; font-weight: 700; font-size: 56px; color: #fff6e6; letter-spacing: 0.5px;
+  text-shadow: 0 2px 0 rgba(60,20,5,0.35); }
+.txt em { font-family: 'Playfair', serif; font-style: italic; font-weight: 700; color: #ffd27a; }
+.txt.sans { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 34px; letter-spacing: 2px; }
+img { display: block; }
+#ana { top: 6px; height: 116px; width: 116px; border-radius: 58px; overflow: hidden; border: 4px solid #fff6e6; box-sizing: border-box; background: #c47a3a; }
+#ana img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+#anaTag { top: 104px; font: 800 10px Montserrat; color: #fff; background: rgba(0,0,0,.55); padding: 1px 4px; }
+#shelfPanel { top: 6px; height: 116px; border-radius: 14px; background: linear-gradient(#fbf1df, #ead6b6); box-shadow: inset 0 -10px 0 #c9a77c; }
+#prow { left: 0; top: 0; width: 1536px; height: 128px; }
+#prow img { position: absolute; filter: drop-shadow(0 3px 2px rgba(60,25,5,.45)); }
+#shelf { left: 0; top: 0; }
+#win { left: 0; top: 0; }
+#logoS, #logoK, #logoW { top: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="barro" width="1836" height="128"></canvas>
+  <div id="red"></div>
+  <svg id="stripes" width="1536" height="128"></svg>
+  <svg id="shelf" width="1536" height="128"></svg>
+  <svg id="line" width="1536" height="128"><path id="linePath" fill="none" stroke-linecap="round"/></svg>
+  <svg id="win" width="1536" height="128"></svg>
+  <div id="ana"><img src="ana_placeholder.png"></div>
+  <div id="anaTag">ILUSTRAÇÃO PROVISÓRIA</div>
+  <div id="shelfPanel"></div><div id="prow"></div>
+  <img id="logoS" src="logo_keyline.png">
+  <img id="logoK" src="logo_keyline.png">
+  <div class="txt" id="t1"></div>
+  <div class="txt sans" id="t2"></div>
+</div>
+<script>
+const W = 1536, H = 128;
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const ramp = (t, a, b) => ease((t - a) / (b - a));           // 0→1 between a and b
+const win = (t, a, b, f = .6) => Math.min(ramp(t, a, a + f), 1 - ramp(t, b - f, b)); // fade in/out window
+
+// --- low-frequency clay (barro) texture, gentle so it doesn't turn into LED noise ---
+(function paintBarro() {
+  const c = $('barro'), g = c.getContext('2d'), w = c.width, h = c.height;
+  const img = g.createImageData(w, h);
+  const rnd = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+  const smooth = (x, y) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    const a = rnd(xi, yi), b = rnd(xi + 1, yi), c2 = rnd(xi, yi + 1), d = rnd(xi + 1, yi + 1);
+    return a + (b - a) * u + (c2 - a) * v + (a - b - c2 + d) * u * v;
+  };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let n = 0, amp = 1, f = 1 / 90, tot = 0;
+    for (let o = 0; o < 4; o++) { n += smooth(x * f, y * f * 1.6) * amp; tot += amp; amp *= .5; f *= 2.1; }
+    n /= tot;
+    const vig = 1 - 0.18 * Math.pow(Math.abs(y - h / 2) / (h / 2), 2);
+    const k = (0.82 + 0.3 * n) * vig;
+    const i = (y * w + x) * 4;
+    img.data[i] = clamp(150 * k, 0, 255); img.data[i + 1] = clamp(78 * k, 0, 255); img.data[i + 2] = clamp(42 * k, 0, 255); img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+})();
+
+// logo sizes (original 1860x560 incl. keyline)
+const LOGO_AR = 1860 / 560;
+function placeLogo(el, cx, hgt, op) {
+  el.style.height = hgt + 'px'; el.style.width = (hgt * LOGO_AR) + 'px';
+  el.style.left = (cx - hgt * LOGO_AR / 2) + 'px'; el.style.top = ((H - hgt) / 2) + 'px'; el.style.opacity = op;
+}
+function setText(el, html, x, op, dy = 0, align = 'left') {
+  if (el.dataset.h !== html) { el.innerHTML = '<span>' + html + '</span>'; el.dataset.h = html; }
+  const w = el.getBoundingClientRect().width;
+  el.style.left = (align === 'center' ? x - w / 2 : align === 'right' ? x - w : x) + 'px';
+  el.style.opacity = op; el.style.transform = `translateY(${dy}px)`;
+}
+function stripesSVG(svg, progress, color, gapFromCenter) {
+  // three horizontal stripes growing outward from the center (echo of the logo)
+  const ys = [53.6, 64.6, 75.6], hh = 4.4;
+  let s = '';
+  const len = (W / 2 - gapFromCenter) * progress;
+  for (const y of ys) {
+    s += `<rect x="${W / 2 - gapFromCenter - len}" y="${y}" width="${len}" height="${hh}" fill="${color}"/>`;
+    s += `<rect x="${W / 2 + gapFromCenter}" y="${y}" width="${len}" height="${hh}" fill="${color}"/>`;
+  }
+  svg.innerHTML = s;
+}
+function silhouettes(svg, x0, op, shelfOp) {
+  const c = '#3b1a0c';
+  svg.innerHTML = `
+   <rect x="0" y="106" width="${W}" height="7" fill="#4a2410" opacity="${shelfOp}"/>
+   <rect x="0" y="113" width="${W}" height="3" fill="#2b1206" opacity="${shelfOp * .7}"/>
+   <g opacity="${op}" fill="${c}" transform="translate(${x0},0)">
+     <path d="M0 106 L6 74 L54 74 L60 106 Z"/><rect x="-6" y="68" width="72" height="8" rx="3"/><rect x="22" y="60" width="16" height="9" rx="3"/>
+     <path d="M96 106 Q96 70 122 64 Q148 70 148 106 Z"/><rect x="112" y="52" width="20" height="14" rx="3"/>
+     <path d="M182 106 L182 64 Q200 56 218 64 L218 106 Z"/><rect x="186" y="50" width="28" height="10" rx="3"/>
+     <path d="M250 106 Q250 84 286 82 Q322 84 322 106 Z"/>
+     <rect x="356" y="22" width="7" height="84" rx="3"/><ellipse cx="359.5" cy="22" rx="13" ry="18"/>
+   </g>`;
+}
+function windowSVG(svg, cx, op, open) {
+  // stylized taipa window: clay frame, arched top, red interior that opens
+  const w = 330, h = 116, x = cx - w / 2, y = 6;
+  svg.innerHTML = `
+   <g opacity="${op}">
+     <rect x="${x - 14}" y="${y - 2}" width="${w + 28}" height="${h + 6}" rx="16" fill="#5a2a12"/>
+     <rect x="${x - 6}" y="${y + 4}" width="${w + 12}" height="${h - 6}" rx="12" fill="#e9d2b0"/>
+     <rect x="${x}" y="${y + 10}" width="${w}" height="${h - 18}" rx="8" fill="#d10019"/>
+     <rect x="${x}" y="${y + 10}" width="${w / 2 * (1 - open)}" height="${h - 18}" fill="#7a3b17"/>
+     <rect x="${x + w - w / 2 * (1 - open)}" y="${y + 10}" width="${w / 2 * (1 - open)}" height="${h - 18}" fill="#7a3b17"/>
+   </g>`;
+}
+
+const PRODUCTS = [['001',100],['005',100],['dende1',112],['cha_hortela',100],['011',100],['molho_ingles',108],['can1',104],['molho4',108]];
+const prow = $('prow');
+const pimgs = PRODUCTS.map(([n, h]) => { const i = new Image(); i.src = 'prod/' + n + '.png'; i.dataset.h = h; prow.appendChild(i); return i; });
+function products(t0, t1, x0, x1) {
+  // cream shelf panel from x0 to x1; products pop up one by one, all leave together
+  const panelIn = ramp(t, t0, t0 + .6), out = ramp(t, t1 - .6, t1);
+  const panel = $('shelfPanel');
+  panel.style.left = x0 + 'px'; panel.style.width = ((x1 - x0) * panelIn) + 'px'; panel.style.opacity = 1 - out;
+  const widths = pimgs.map(i => i.naturalWidth * (+i.dataset.h) / i.naturalHeight);
+  const gap = ((x1 - x0) - widths.reduce((a, b) => a + b, 0)) / (pimgs.length + 1);
+  let x = x0 + gap;
+  pimgs.forEach((im, k) => {
+    const h = +im.dataset.h, w = widths[k], a = ramp(t, t0 + .5 + k * .14, t0 + .9 + k * .14);
+    im.style.height = h + 'px'; im.style.left = x + 'px'; im.style.top = (116 - h + 12 * (1 - a)) + 'px';
+    im.style.opacity = a * (1 - out); x += w + gap;
+  });
+}
+let t = 0;
+const VERSIONS = {
+  // ---------------- 40 s full story ----------------
+  long: { dur: 40, render(tt) { t = tt;
+    const L = $('linePath'), redOp = Math.max(ramp(t, 21, 22) * (1 - ramp(t, 31, 31.8)), ramp(t, 36.2, 37) * (1 - ramp(t, 39.2, 40)));
+    $('barro').style.transform = `translateX(${-150 - 150 * Math.sin(2 * Math.PI * t / 40)}px)`;
+    $('red').style.opacity = redOp;
+    // line (sulco) — scenes 1-3
+    const draw = ramp(t, 0.3, 3.2);
+    let d, lineOp = 1 - ramp(t, 20.4, 21.2);
+    if (t < 14) {
+      // straight furrow across, then (scene 2) it bends to end at Ana's portrait
+      const bend = ramp(t, 7, 8.4), endX = W - (W - 150) * bend;
+      const y = 98 + 14 * bend;
+      d = bend === 0 ? `M -10 98 L ${-10 + (W + 20) * draw} 98`
+        : `M ${W + 10} ${y} L ${Math.max(endX, 250)} ${y} Q ${Math.max(endX, 250) - 70 * bend} ${y}, ${Math.max(endX, 150)} ${y - 18 * bend}`;
+    } else {
+      // scene 3: becomes the kitchen shelf line
+      const k = ramp(t, 14, 15.2);
+      d = `M -10 ${98 + 10 * k} L ${W + 10} ${98 + 10 * k}`;
+    }
+    L.setAttribute('d', d); L.setAttribute('stroke', '#3d1708'); L.setAttribute('stroke-width', 8); L.style.opacity = lineOp * (t < 14 ? 1 : 1 - ramp(t, 15, 15.6));
+    // shelf + utensils
+    const shelfOp = ramp(t, 14.8, 15.6) * (1 - ramp(t, 20.4, 21.2));
+    silhouettes($('shelf'), 70 - 40 * ramp(t, 14, 21), ramp(t, 15.2, 16.4) * (1 - ramp(t, 20.4, 21.2)), shelfOp);
+    // Ana
+    const anaOp = ramp(t, 7.8, 8.8) * (1 - ramp(t, 13.4, 14));
+    $('ana').style.left = (34 - 30 * (1 - ramp(t, 7.8, 8.8))) + 'px'; $('ana').style.opacity = anaOp;
+    $('anaTag').style.left = '30px'; $('anaTag').style.opacity = anaOp;
+    // stripes + products (scene 4)
+    stripesSVG($('stripes'), ramp(t, 21.4, 23), 'rgba(255,255,255,.18)', 0);
+    $('stripes').style.opacity = redOp;
+    products(21.6, 26.6, 850, 1510);
+    // window (scene 5)
+    windowSVG($('win'), 1250, ramp(t, 31.5, 32.3) * (1 - ramp(t, 36.2, 36.8)), ramp(t, 32.3, 33.4));
+    // small corner logo (scenes 1-3) / big logos
+    placeLogo($('logoS'), W - 120, 58, win(t, 0.8, 14));
+    let kx = W - 210, kh = 92, kop = win(t, 26.4, 31.4);
+    if (t >= 31.4 && t < 36.6) { kx = 1250; kh = 78; kop = ramp(t, 33, 33.8) * (1 - ramp(t, 36, 36.6)); }
+    if (t >= 36.6) { kx = W / 2 - 150; kh = 104; kop = ramp(t, 36.8, 37.6) * (1 - ramp(t, 39.2, 39.9)); }
+    placeLogo($('logoK'), kx, kh, kop);
+    // texts
+    const T = $('t1');
+    if (t < 7) setText(T, 'Toda história tem uma <em>raiz.</em>', W / 2 - 60, win(t, 1.6, 6.8), 6 * (1 - ramp(t, 1.6, 2.4)), 'center');
+    else if (t < 14) setText(T, 'A nossa tem nome: <em>Ana.</em>', 200, win(t, 8.6, 13.8), 6 * (1 - ramp(t, 8.6, 9.4)));
+    else if (t < 21) setText(T, 'Trabalho na terra. <em>Cuidado à mesa.</em>', 470, win(t, 15.8, 20.8), 6 * (1 - ramp(t, 15.8, 16.6)));
+    else if (t < 26.4) setText(T, 'Temperos e alimentos <em>DAANA</em>', 40, win(t, 22.4, 26.4), 6 * (1 - ramp(t, 22.6, 23.4)));
+    else if (t < 31.4) setText(T, 'Leve a DAANA para a <em>sua loja.</em>', 120, win(t, 26.8, 31.4), 6 * (1 - ramp(t, 26.6, 27.4)));
+    else if (t < 36.6) setText(T, 'Entre. A cozinha de Ana é <em>sua também.</em>', 40, win(t, 32, 36.4), 6 * (1 - ramp(t, 32, 32.8)));
+    else setText(T, '', 0, 0);
+    setText($('t2'), '@daanaoficial', W / 2 + 130, win(t, 37.2, 39.6, .5), 0);
+  }},
+  // ---------------- 15 s short (brand, products, invite) ----------------
+  short: { dur: 15, render(tt) { t = tt;
+    const redOp = 1 - ramp(t, 11.6, 12.3) + ramp(t, 14.4, 15);
+    $('barro').style.transform = `translateX(${-150 - 60 * t / 15}px)`;
+    $('red').style.opacity = Math.min(1, redOp);
+    $('linePath').style.opacity = 0; $('shelf').innerHTML = ''; $('ana').style.opacity = 0; $('anaTag').style.opacity = 0;
+    stripesSVG($('stripes'), ramp(t, 0.2, 1.6), '#ffffff', 184);
+    $('stripes').style.opacity = 1 - ramp(t, 2.6, 3.2);
+    placeLogo($('logoS'), 0, 58, 0);
+    let kx = W / 2, kh = 112, kop = ramp(t, 0.6, 1.4) * (1 - ramp(t, 2.6, 3.2));
+    if (t >= 3.2 && t < 12) { kx = W - 210; kh = 92; kop = win(t, 8.2, 11.8); }
+    if (t >= 12) { kx = 1250; kh = 78; kop = ramp(t, 13, 13.6) * (1 - ramp(t, 14.4, 14.9)); }
+    placeLogo($('logoK'), kx, kh, kop);
+    products(3, 8.2, 850, 1510);
+    windowSVG($('win'), 1250, ramp(t, 11.8, 12.4) * (1 - ramp(t, 14.4, 14.9)), ramp(t, 12.3, 13.2));
+    const T = $('t1');
+    if (t < 8) setText(T, 'Temperos e alimentos <em>DAANA</em>', 40, win(t, 3.4, 8), 6 * (1 - ramp(t, 3.6, 4.4)));
+    else if (t < 12) setText(T, 'Leve a DAANA para a <em>sua loja.</em>', 120, win(t, 8.4, 11.8), 6 * (1 - ramp(t, 8.2, 9)));
+    else setText(T, 'Entre. A cozinha de Ana é <em>sua também.</em>', 40, win(t, 12.2, 14.6, .4), 0);
+    setText($('t2'), '', 0, 0);
+  }},
+};
+window.__render = (v, t) => VERSIONS[v].render(t);
+window.__dur = v => VERSIONS[v].dur;
+</script>
+</body>
+</html>
