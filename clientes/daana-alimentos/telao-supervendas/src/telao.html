@@ -16,7 +16,7 @@ canvas#barro { left: 0; top: 0; }
 .txt { top: 0; height: 128px; display: flex; align-items: center; white-space: nowrap;
   font-family: 'Playfair', serif; font-weight: 700; font-size: 56px; color: #fff6e6; letter-spacing: 0.5px;
   text-shadow: 0 2px 0 rgba(60,20,5,0.35); }
-.txt em { font-family: 'Playfair', serif; font-style: italic; font-weight: 700; color: #ffd27a; }
+.txt em { font-family: 'Playfair', serif; font-style: italic; font-weight: 700; color: #ffd27a; font-variant-numeric: lining-nums; }
 .txt.sans { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 34px; letter-spacing: 2px; }
 img { display: block; }
 #ana { top: 6px; height: 116px; width: 116px; border-radius: 58px; overflow: hidden; border: 4px solid #fff6e6; box-sizing: border-box; background: #f6ead2; }
@@ -131,15 +131,17 @@ function windowSVG(svg, cx, op, open) {
    </g>`;
 }
 
-const PRODUCTS = [['001',100],['005',100],['dende1',112],['cha_hortela',100],['011',100],['molho_ingles',108],['can1',104],['molho4',108]];
+const PRODUCTS = [['001',100],['005',100],['dende1',112],['cha_hortela',100],['011',100],['molho_ingles',108],['can1',104],['molho4',108],
+  ['007',100],['008',100],['020',100],['002',100],['003',100],['c_barba',100],['c_capim_limao',100],['c_carqueja',100],['molho2',104]];
 const prow = $('prow');
 const pimgs = PRODUCTS.map(([n, h]) => { const i = new Image(); i.src = 'prod/' + n + '.png'; i.dataset.h = h; prow.appendChild(i); return i; });
-function products(t0, t1, x0, x1, list = null) {
+function products(t0, t1, x0, x1, list = null, o = {}) {
+  const D = o.d ?? .5, ST = o.st ?? .14, OUT = o.out ?? .6;
   const show = pimgs.map((_, k) => !list || list.includes(PRODUCTS[k][0]));
   // cream shelf panel from x0 to x1; products pop up one by one, all leave together
-  const panelIn = ramp(t, t0, t0 + .6), out = ramp(t, t1 - .6, t1);
+  const panelIn = o.panel ? 1 : ramp(t, t0, t0 + .6), out = ramp(t, t1 - OUT, t1);
   const panel = $('shelfPanel');
-  panel.style.left = x0 + 'px'; panel.style.width = ((x1 - x0) * panelIn) + 'px'; panel.style.opacity = 1 - out;
+  panel.style.left = x0 + 'px'; panel.style.width = ((x1 - x0) * panelIn) + 'px'; panel.style.opacity = o.panel ? o.panel : 1 - out;
   const widths = pimgs.map((i, k) => show[k] ? i.naturalWidth * (+i.dataset.h) / i.naturalHeight : 0);
   const n = show.filter(Boolean).length;
   const gap = ((x1 - x0) - widths.reduce((a, b) => a + b, 0)) / (n + 1);
@@ -147,7 +149,7 @@ function products(t0, t1, x0, x1, list = null) {
   let x = x0 + gap;
   pimgs.forEach((im, k) => {
     if (!show[k]) { im.style.opacity = 0; return; }
-    const h = +im.dataset.h, w = widths[k], a = ramp(t, t0 + .5 + j * .14, t0 + .9 + j * .14); j++;
+    const h = +im.dataset.h, w = widths[k], a = ramp(t, t0 + D + j * ST, t0 + D + .4 + j * ST); j++;
     im.style.height = h + 'px'; im.style.left = x + 'px'; im.style.top = (116 - h + 12 * (1 - a)) + 'px';
     im.style.opacity = a * (1 - out); x += w + gap;
   });
@@ -184,7 +186,7 @@ const VERSIONS = {
     // stripes + products (scene 4)
     stripesSVG($('stripes'), ramp(t, 21.4, 23), 'rgba(255,255,255,.18)', 0);
     $('stripes').style.opacity = redOp;
-    products(21.6, 26.6, 850, 1510);
+    products(21.6, 26.6, 850, 1510, ['001', '005', 'dende1', 'cha_hortela', '011', 'molho_ingles', 'can1', 'molho4']);
     // window (scene 5)
     windowSVG($('win'), 1250, ramp(t, 31.5, 32.3) * (1 - ramp(t, 36.2, 36.8)), ramp(t, 32.3, 33.4));
     // small corner logo (scenes 1-3) / big logos
@@ -218,7 +220,7 @@ const VERSIONS = {
     if (t >= 3.2 && t < 12) { kx = W - 210; kh = 92; kop = win(t, 8.2, 11.8); }
     if (t >= 12) { kx = 1250; kh = 78; kop = ramp(t, 13, 13.6) * (1 - ramp(t, 14.4, 14.9)); }
     placeLogo($('logoK'), kx, kh, kop);
-    products(3, 8.2, 850, 1510);
+    products(3, 8.2, 850, 1510, ['001', '005', 'dende1', 'cha_hortela', '011', 'molho_ingles', 'can1', 'molho4']);
     windowSVG($('win'), 1250, ramp(t, 11.8, 12.4) * (1 - ramp(t, 14.4, 14.9)), ramp(t, 12.3, 13.2));
     const T = $('t1');
     if (t < 8) setText(T, 'Temperos e alimentos <em>DAANA</em>', 40, win(t, 3.4, 8), 6 * (1 - ramp(t, 3.6, 4.4)));
@@ -293,6 +295,66 @@ const VERSIONS = {
     else if (t < 12) pair('Leve a DAANA', 'para a <em>sua loja.</em>', 8.4, 11.8);
     else pair('Entre. A cozinha de Ana', 'é <em>sua também.</em>', 12.2, 14.6);
     setText($('t2'), '', 0, 0);
+  }},
+  // ---------- 60 s CENTER-FREE: full story (sabores de Ana, legado da Vanessa, portfólio) ----------
+  longC60: { dur: 60, render(tt) { t = tt;
+    const LX = 600, RX = 936, FS = '50px';
+    const redOp = Math.max(ramp(t, 30.5, 31.5) * (1 - ramp(t, 49.6, 50.4)), ramp(t, 55.8, 56.6) * (1 - ramp(t, 59.2, 60)));
+    $('barro').style.transform = `translateX(${-150 - 150 * Math.sin(2 * Math.PI * t / 60)}px)`;
+    $('red').style.opacity = redOp;
+    // furrow under the text (0-19), becomes the shelf in the "trabalho" scene (19-25)
+    const draw = ramp(t, 0.3, 3.2), k = ramp(t, 19, 20.2);
+    const L = $('linePath');
+    L.setAttribute('d', `M -10 ${104 + 4 * k} L ${-10 + (W + 20) * draw} ${104 + 4 * k}`);
+    L.setAttribute('stroke', '#3d1708'); L.setAttribute('stroke-width', 7);
+    L.style.opacity = 1 - ramp(t, 24.6, 25.4);
+    const sop = ramp(t, 20.2, 21.2) * (1 - ramp(t, 24.6, 25.4)), c = '#3b1a0c';
+    $('shelf').innerHTML = `<g opacity="${sop}" fill="${c}">
+      <path d="M40 108 Q40 86 76 84 Q112 86 112 108 Z"/><rect x="134" y="26" width="7" height="82" rx="3"/><ellipse cx="137.5" cy="26" rx="13" ry="18"/>
+      <path d="M1410 108 L1416 76 L1464 76 L1470 108 Z"/><rect x="1404" y="70" width="72" height="8" rx="3"/><rect x="1432" y="62" width="16" height="9" rx="3"/>
+      <path d="M1486 108 L1486 70 Q1500 63 1514 70 L1514 108 Z"/><rect x="1489" y="57" width="22" height="10" rx="3"/></g>`;
+    // Ana portrait: her name (7-13) and again beside "à neta Vanessa" (25-28)
+    const anaOp = Math.max(ramp(t, 9.4, 10.2) * (1 - ramp(t, 12.4, 13)), 0);
+    $('ana').style.left = RX + 'px'; $('ana').style.opacity = anaOp;
+    $('anaTag').style.opacity = 0; $('win').innerHTML = '';
+    placeLogo($('logoS'), 0, 58, 0); placeLogo($('logoK'), 0, 58, 0);
+    // products: mixed shelf (31-36), then one category at a time (36-42)
+    const CATS = [
+      ['Temperos', ['005', '007', '011', '008', '020', 'can1']],
+      ['Chás', ['c_barba', 'c_capim_limao', 'c_carqueja', 'cha_hortela']],
+      ['Castanhas', ['001', '002', '003']],
+      ['Molhos e azeite', ['molho_ingles', 'molho2', 'molho4', 'dende1']],
+    ];
+    if (t < 36) products(31.6, 36, RX, 1512, ['001', 'dende1', 'cha_hortela', '011', 'molho_ingles', 'can1'], { out: .35 });
+    else if (t < 42) {
+      const i = Math.min(3, Math.floor((t - 36) / 1.5)), a = 36 + i * 1.5;
+      products(a, a + 1.5, RX, 1512, CATS[i][1], { d: .05, st: .06, out: .3, panel: i === 3 ? 1 - ramp(t, 41.6, 42) : 1 });
+    } else products(-10, -9, RX, 1512, []);
+    stripesSVG($('stripes'), ramp(t, 56.8, 58), '#ffffff', 150, [44, 59.5, 75], 9, 'right');
+    $('stripes').style.opacity = 1 - ramp(t, 59.2, 59.9);
+    const A = $('t1'), B = $('t3');
+    A.style.fontSize = B.style.fontSize = FS;
+    const pair = (l, r, a, b, rx = RX, f = .6, lag = .6) => {
+      setText(A, l, LX, win(t, a, b, f), 6 * (1 - ramp(t, a, a + .8)), 'right');
+      setText(B, r, rx, win(t, a + lag, b, f), 6 * (1 - ramp(t, a + lag, a + lag + .8)));
+    };
+    if (t < 7) pair('Toda história', 'tem uma <em>raiz.</em>', 1.6, 6.8);
+    else if (t < 13) pair('A nossa tem nome:', '<em>Ana.</em>', 8, 12.9, RX + 136);
+    else if (t < 16) pair('Manauê, cocada,', 'bolo de aipim…', 13.3, 16, RX, .4, .5);
+    else if (t < 19) pair('Sabores que ficaram', '<em>na memória.</em>', 16.1, 18.9, RX, .4, .4);
+    else if (t < 25) pair('Trabalho na terra.', '<em>Cuidado à mesa.</em>', 20.4, 24.9);
+    else if (t < 28) pair('Da avó Ana', 'à neta <em>Vanessa.</em>', 25.3, 28, RX, .4, .5);
+    else if (t < 31) pair('Uma memória', 'que virou <em>marca.</em>', 28.1, 30.9, RX, .4, .4);
+    else if (t < 36) pair('Temperos e alimentos', '', 32, 36, RX, .4);
+    else if (t < 42) {
+      const i = Math.min(3, Math.floor((t - 36) / 1.5)), a = 36 + i * 1.5;
+      setText(A, `<em>${CATS[i][0]}</em>`, LX, win(t, a, a + 1.5, .25), 0, 'right'); setText(B, '', RX, 0);
+    }
+    else if (t < 45) pair('Indústria baiana', '<em>há mais de 20 anos.</em>', 42.2, 45, RX, .4, .4);
+    else if (t < 50) pair('Leve a DAANA', 'para a <em>sua loja.</em>', 45.2, 49.9);
+    else if (t < 56) pair('Entre. A cozinha de Ana', 'é <em>sua também.</em>', 50.6, 55.8);
+    else pair('', '', 0, 0);
+    setText($('t2'), '@daanaoficial', LX, win(t, 57, 59.6, .5), 0, 'right');
   }},
 };
 window.__plaque = on => $('plaque').classList.toggle('on', on);

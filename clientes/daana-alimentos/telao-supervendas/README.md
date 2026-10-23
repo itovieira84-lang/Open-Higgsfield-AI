@@ -8,6 +8,7 @@ A placa física da logo DAANA fica **na frente do centro do telão**, cobrindo c
 
 | Arquivo | Uso |
 | --- | --- |
+| `daana_telao_60s_centro-livre.mp4` | **Para o evento**: história completa estendida (60 s), com os sabores de Ana, o legado da neta Vanessa e o portfólio por categoria. Quadros-chave em `sheet_60s_centro-livre.png`; simulação em `simulacao_com_placa_60s.mp4` |
 | `daana_telao_40s_centro-livre.mp4` | **Para o evento**: história completa (40 s), sem nada importante atrás da placa |
 | `daana_telao_15s_centro-livre.mp4` | **Para o evento**: versão curta (15 s), sem nada importante atrás da placa |
 | `daana_telao_40s.mp4` / `daana_telao_15s.mp4` | Versões com a tela inteira livre, para usar sem a placa (outros eventos, redes) |
@@ -38,6 +39,26 @@ Todos em H.264, 30 fps, em loop sem corte.
 | 26,5–31,5 | Logo oficial | Leve a DAANA para a *sua loja.* |
 | 31,5–36,5 | Barro / janela de taipa | Entre. A cozinha de Ana é *sua também.* |
 | 36,5–40 | Logo + @daanaoficial, retorno ao barro | — |
+
+## Roteiro (60 s, centro livre)
+
+| Tempo | Esquerda | Direita |
+| --- | --- | --- |
+| 0–7 | Toda história | tem uma *raiz.* |
+| 7–13 | A nossa tem nome: | [retrato] *Ana.* |
+| 13–16 | Manauê, cocada, | bolo de aipim… |
+| 16–19 | Sabores que ficaram | *na memória.* |
+| 19–25 | Trabalho na terra. | *Cuidado à mesa.* |
+| 25–28 | Da avó Ana | à neta *Vanessa.* |
+| 28–31 | Uma memória | que virou *marca.* |
+| 31–36 | Temperos e alimentos | prateleira com 6 produtos |
+| 36–42 | *Temperos* / *Chás* / *Castanhas* / *Molhos e azeite* (1,5 s cada) | produtos de cada categoria |
+| 42–45 | Indústria baiana | *há mais de 20 anos.* |
+| 45–50 | Leve a DAANA | para a *sua loja.* |
+| 50–56 | Entre. A cozinha de Ana | é *sua também.* |
+| 56–60 | @daanaoficial | faixas saindo da placa |
+
+Para renderizar: `node render.js longC60 ../daana_telao_60s_centro-livre.mp4 30`
 
 ## Regras aplicadas
 
