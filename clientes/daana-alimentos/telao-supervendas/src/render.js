@@ -8,14 +8,19 @@ const path = require('path');
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1536, height: 128 }, deviceScaleFactor: 1 });
   await page.goto('file://' + path.join(__dirname, 'telao.html'));
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    // fonts load lazily; force every face before measuring text
+    await Promise.all(['700 50px Playfair', 'italic 700 50px Playfair', '800 34px Montserrat'].map(f => document.fonts.load(f)));
+    await document.fonts.ready;
+  });
   await page.waitForTimeout(300);
+  if (process.env.PLAQUE) await page.evaluate(() => window.__plaque(true)); // preview-only mock of the physical plaque
   const clip = { x: 0, y: 0, width: 1536, height: 128 };
 
   if (out === 'stills') {
     for (const t of arg3.split(',').map(Number)) {
       await page.evaluate(([v, t]) => window.__render(v, t), [version, t]);
-      await page.screenshot({ path: `still_${version}_${t}.png`, clip });
+      await page.screenshot({ path: `still_${version}${process.env.PLAQUE ? '_placa' : ''}_${t}.png`, clip });
     }
     await browser.close();
     return;

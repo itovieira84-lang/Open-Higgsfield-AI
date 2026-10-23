@@ -52,7 +52,8 @@ Luz natural quente, ambiente de varanda/área externa: mesa de madeira avermelha
 Resumo do que aparece no Instagram (detalhes e diagnóstico em `instagram-analise.md`):
 
 - Indústria baiana de temperos, condimentos, especiarias e alimentos, há mais de 20 anos ("Grupo DaAna Produtos").
-- A marca é inspirada em **Ana Delmira** (a casa de taipa, o fogão a lenha e os doces caseiros: manauê, cocada, bolo de aipim, arroz-doce).
+- A marca é inspirada em **Ana Delmira** (a casa de taipa, o fogão a lenha e os doces caseiros: manauê, cocada, bolo de aipim, arroz-doce). Antes de reunir pessoas à mesa, Ana trabalhava a terra. A neta, **Vanessa dos Santos**, transformou essa memória na homenagem que deu origem à "cozinha de Ana".
+- **Ilustração oficial de Ana** em `ana/ana-ilustracao-oficial.png`: lenço laranja, auréola de raios amarelos, blusa verde com estrelas e cactos, e ao fundo mandacaru, serra e casa de taipa. Usar sempre este arquivo, sem redesenhar. Os carrosséis de referência estão na mesma pasta.
 - Vende para lojistas (B2B) e para quem cozinha em casa (B2C).
 - Produtos já vistos: tempero Ana Maria, páprica doce, orégano, sal, pimenta, grão-de-bico 250 g, farinha de aveia, castanha, óleo de coco, molho inglês, granola crocante 200 g.
 
