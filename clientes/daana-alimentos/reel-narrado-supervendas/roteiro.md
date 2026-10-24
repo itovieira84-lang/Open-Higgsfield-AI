@@ -56,3 +56,11 @@ Usar image-to-video ou "ingredients" com a referência da Ana. Formato vertical 
 2. **Alternativa:** voz sintética feminina brasileira, calorosa e madura (por exemplo, uma das vozes ElevenLabs disponíveis no app MATAI).
 
 **Trilha:** violão ou sanfona suaves, crescendo no convite final. Escolher no Instagram, para usar uma faixa licenciada.
+
+## Versão produzida (24/10)
+
+- **Arquivo:** `daana_reel_narrado.mp4`, 1080 × 1920, 59 s, com narração e legendas.
+- **Cenas 1 a 4:** geradas no Canva, usando como referência a Ana realista do carrossel 01. Os originais estão em `src/cena1..4.jpg`.
+- **Narração provisória:** voz sintética pt-BR (Microsoft Francisca, via edge-tts), em `src/narracao_provisoria.wav`. **Substituir pela gravação da Vanessa** quando ela gravar. Basta trocar o áudio, sem precisar renderizar o vídeo de novo.
+- **Tempos de cada frase** (para a Vanessa gravar no mesmo ritmo): 0,8 s · 6,6 s · 13,0 s · 21,5 s · 26,6 s · 32,4 s · 38,4 s · 44,2 s.
+- **Para renderizar de novo:** `src/render_seg.js` divide o vídeo em partes paralelas. Com um único processo, o render passa de 30 minutos.
