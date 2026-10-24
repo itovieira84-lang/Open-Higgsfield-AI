@@ -1,6 +1,6 @@
 # Reel narrado — "A cozinha de Ana te espera"
 
-Formato: Reels 1080 × 1920, ~50 s. Narração em primeira pessoa pela neta, **Vanessa dos Santos**, convidando para o stand no Supervendas Sergipe (26 a 28/10, Centro de Convenções AM Malls).
+Formato: Reels 1080 × 1920, ~50 s. Narração em primeira pessoa pela neta, **Vanessa** (só o primeiro nome), convidando para o stand no Supervendas Sergipe (26 a 28/10, Centro de Convenções AM Malls).
 
 ## Personagens
 

@@ -10,7 +10,7 @@ Formato: vertical 1080 × 1920 (Reels, Stories, Status do WhatsApp), 43 s, H.264
 | 5,4–9,6 | Ilustração de Ana na parede vermelha (carrossel 03) | Nela, uma mulher chamada *Ana.* |
 | 9,6–13,8 | Foto real: prato servido nas mãos (ensaio do Drive) | Mãos que plantavam, colhiam e reuniam todos *à mesa.* |
 | 13,8–19,6 | Tipografia sobre fundo de barro | Manauê. Cocada. Bolo de aipim. Café passado na hora. → Sabores que viraram *memória.* |
-| 19,6–25,2 | Retrato de Ana no porta-retrato (carrossel 11) | A neta, Vanessa dos Santos, guardou cada lembrança… / …e transformou afeto *em marca.* |
+| 19,6–25,2 | Retrato de Ana no porta-retrato (carrossel 11) | A neta, Vanessa, guardou cada lembrança… / …e transformou afeto *em marca.* |
 | 25,2–30,4 | Logo + 12 embalagens reais | Há mais de 20 anos, esse cuidado vai *da Bahia para a sua mesa.* |
 | 30,4–35,2 | Projeção do stand (card do Supervendas) | Agora, a cozinha de Ana *abre as portas para você.* |
 | 35,2–43 | Centro de Convenções + logo + datas | A cozinha DAANA vai ao *Supervendas Sergipe.* · 26, 27 e 28 de outubro · Centro de Convenções AM Malls · Venha viver essa história *com a gente.* · @daanaoficial |
